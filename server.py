@@ -2,6 +2,7 @@ from typing import Annotated
 from fastmcp import FastMCP
 from fastmcp.server.context import Context
 from fastmcp.dependencies import CurrentContext
+from datetime import datetime
 
 mcp = FastMCP(
     name="todo",
@@ -61,9 +62,12 @@ def _format_todos(todos: list[dict]) -> str:
     name="write_todos",
     title="Write Todo List",
     description="Replace the entire todo list with a new list of todos. Each todo must have 'content' (imperative task description), 'activeForm' (present continuous form), and 'status' (pending/in_progress/completed).",
+    exclude_args=["cutoff_date"],
+    tags={"backtesting_supported"},
 )
 async def write_todos(
     todos: Annotated[list[dict], "List of todo objects with 'content', 'activeForm', and 'status' fields"],
+    cutoff_date: Annotated[str, "The date must be in the format YYYY-MM-DD"] = datetime.now().strftime("%Y-%m-%d"),
     ctx: Context = CurrentContext(),
 ) -> str:
     session_key = _get_session_key(ctx)
